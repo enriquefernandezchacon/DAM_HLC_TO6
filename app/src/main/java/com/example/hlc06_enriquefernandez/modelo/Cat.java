@@ -10,13 +10,9 @@ public class Cat {
     @SerializedName("url")
     private final String url;
 
-    @SerializedName("name")
-    private final String name;
-
-    public Cat(String id, String url, String name) {
+    public Cat(String id, String url) {
         this.id = id;
         this.url = url;
-        this.name = name;
     }
 
     public String getId() {
@@ -29,9 +25,5 @@ public class Cat {
 
     public String getUrl() {
         return url;
-    }
-
-    public String getName() {
-        return name;
     }
 }

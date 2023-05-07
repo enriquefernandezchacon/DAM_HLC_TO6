@@ -23,32 +23,31 @@ import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity {
 
-    private RecyclerView recyclerView;
+    private static final int CATS_LIMIT = 2;
     private CatAdapter catAdapter;
-    private List<Cat> catList = new ArrayList<>();
+    private final List<Cat> catList = new ArrayList<>();
     private ICatApiService catApiService;
-    private Button btnMoreCats;
-    private Button btnFavourites;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        //Establecemos el layout de la actividad
         setContentView(R.layout.activity_main);
-
-        recyclerView = findViewById(R.id.recyclerView);
-        btnMoreCats = findViewById(R.id.btn_more_cats);
-        btnFavourites = findViewById(R.id.btn_favourites);
-
+        //Obtenemos las referencias a los elementos de la interfaz
+        RecyclerView recyclerView = findViewById(R.id.recyclerView);
+        Button btnMoreCats = findViewById(R.id.btn_more_cats);
+        Button btnFavourites = findViewById(R.id.btn_favourites);
+        //Obtenemoun una instancia de la api de gatos combinndo la interfaz con retorfit
         catApiService = ApiClient.getInstance().create(ICatApiService.class);
-
+        //Creamos el adaptador y lo asignamos al recycler view
         catAdapter = new CatAdapter(catList, this, catApiService);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(catAdapter);
-
+        //Cargamos los gatos
         loadMoreCats();
-
+        //Asignamos la funcion al boton de cargar mas gatos
         btnMoreCats.setOnClickListener(v -> loadMoreCats());
-
+        //Asignamos la funcion al boton de ver favoritos
         btnFavourites.setOnClickListener(v -> {
             Intent intent = new Intent(MainActivity.this, FavouritesActivity.class);
             startActivity(intent);
@@ -56,19 +55,47 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void loadMoreCats() {
-        Call<List<Cat>> call = catApiService.getCats(2);
+        //Preparamos la llamada a la api
+        Call<List<Cat>> call = catApiService.getCats(CATS_LIMIT);
+        //Realizamos la llamada a la api
         call.enqueue(new Callback<List<Cat>>() {
+            //Si la llamada es correcta
             @Override
             public void onResponse(Call<List<Cat>> call, Response<List<Cat>> response) {
+                //Si la respuesta es correcta
                 if (response.isSuccessful()) {
+                    //Limpiamos la lista de gatos y añadimos los nuevos
+
                     catList.clear();
-                    catList.addAll(response.body());
+                    for (Cat cat : response.body()) {
+                        Call<Cat> callSingleCat = catApiService.getCatById(cat.getId());
+                        callSingleCat.enqueue(new Callback<Cat>() {
+                            @Override
+                            public void onResponse(Call<Cat> call, Response<Cat> response) {
+                                if (response.isSuccessful()) {
+                                    catList.add(response.body());
+                                    catAdapter.notifyDataSetChanged();
+                                } else {
+                                    Toast.makeText(MainActivity.this, R.string.failed_to_load_single_cats, Toast.LENGTH_SHORT).show();
+                                }
+                            }
+
+                            @Override
+                            public void onFailure(Call<Cat> call, Throwable t) {
+                                Toast.makeText(MainActivity.this, R.string.failed_to_load_cats, Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    }
+                    //catList.addAll(response.body());
+                    //Notificamos al adaptador que los datos han cambiado
                     catAdapter.notifyDataSetChanged();
                 } else {
+                    //Si la respuesta no es correcta mostramos un mensaje de error
                     Toast.makeText(MainActivity.this, R.string.failed_to_load_cats, Toast.LENGTH_SHORT).show();
                 }
             }
 
+            //Si la llamada falla mostramos un mensaje de error
             @Override
             public void onFailure(Call<List<Cat>> call, Throwable t) {
                 Toast.makeText(MainActivity.this, R.string.failed_to_load_cats, Toast.LENGTH_SHORT).show();

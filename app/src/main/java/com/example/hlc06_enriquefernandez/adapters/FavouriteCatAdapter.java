@@ -49,24 +49,33 @@ public class FavouriteCatAdapter extends RecyclerView.Adapter<FavouriteCatAdapte
                 .load(favouriteCat.getUrl())
                 .into(holder.favouriteCatImage);
 
-        // Maneja el clic en el botón "ELIMINAR FAV"
+        // Maneja el clic en el botón "ELIMINAR FAVORITO"
         holder.btnRemoveFav.setOnClickListener(v -> {
+            //Construye la llamada a la API para eliminar el gato favorito
             Call<Void> call = catApiService.removeFromFavourites(favouriteCat.getId());
+            //Realiza la llamada a la API y maneja la respuesta
             call.enqueue(new Callback<Void>() {
+                //Respuesta del servidor
                 @Override
                 public void onResponse(Call<Void> call, retrofit2.Response<Void> response) {
+                    //Respuesta afirmativa
                     if (response.isSuccessful()) {
+                        //Muestra un mensaje de éxito
                         Toast.makeText(context, R.string.success_delete_cat, Toast.LENGTH_SHORT).show();
+                        //Elimina el gato de la lista de favoritos
                         favouriteCatList.remove(position);
                         notifyItemRemoved(position);
                         notifyItemRangeChanged(position, favouriteCatList.size());
                     } else {
+                        //Muestra un mensaje de error
                         Toast.makeText(context, R.string.error_delete_cat, Toast.LENGTH_SHORT).show();
                     }
                 }
 
+                //Error en la llamada a la API
                 @Override
                 public void onFailure(Call<Void> call, Throwable t) {
+                    //Muestra un mensaje de error
                     Toast.makeText(context, R.string.error_delete_cat, Toast.LENGTH_SHORT).show();
                 }
             });

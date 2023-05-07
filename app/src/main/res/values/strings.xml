@@ -5,8 +5,11 @@
     <string name="failed_to_load_cats">Error al cargar los gatos</string>
     <string name="unknown_cat">Gato desconocido</string>
     <string name="failed_to_load_favourites">Error al cargar los favoritos</string>
-    <string name="more_cats">Más gatos</string>
-    <string name="favourites">Favoritos</string>
+    <string name="more_cats">Más gatos...</string>
+    <string name="favourites">Gatos Favoritos</string>
     <string name="error_delete_cat">Error al eliminar el gato de favoritos</string>
     <string name="success_delete_cat">Gato eliminado de favoritos</string>
+    <string name="success_add_cat">Gato añadido a favoritos</string>
+    <string name="error_add_cat">Error al añadir el gato a favoritos</string>
+    <string name="failed_to_load_single_cats">Error al cargar los datos de un gato de forma individual</string>
 </resources>

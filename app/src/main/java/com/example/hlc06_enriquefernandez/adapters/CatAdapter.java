@@ -6,7 +6,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -52,32 +51,29 @@ public class CatAdapter extends RecyclerView.Adapter<CatAdapter.ViewHolder> {
                 .load(cat.getUrl())
                 .into(holder.catImage);
 
-        // Asigna el nombre del gato si está disponible
-        if (cat.getName() != null) {
-            holder.catName.setText(cat.getName());
-        } else {
-            holder.catName.setText(R.string.unknown_cat);
-        }
-
-        // Maneja el clic en el botón "FAV"
+        // Maneja el clic en el botón "AÑADIR A FAVORITOS"
         holder.btnFav.setOnClickListener(v -> {
-            // Aquí puedes implementar la lógica para añadir el gato a la lista de favoritos,
-            // realizando una llamada a la API utilizando catApiService utilizando RetroFit y el catservice
+            // Nuevo objeto NewFavouriteCat con el id del gato que cumple el modelo JSON esperado por la API
             NewFavouriteCat newFavouriteCat = new NewFavouriteCat(cat.getId());
+            // Llamada a la API para añadir el gato a favoritos
             Call<NewFavouriteCatResponse> call = catApiService.addToFavourites(newFavouriteCat);
+            // Callback para manejar la respuesta de la API
             call.enqueue(new Callback<NewFavouriteCatResponse>() {
+                //Respuesta del servidor
                 @Override
                 public void onResponse(Call<NewFavouriteCatResponse> call, retrofit2.Response<NewFavouriteCatResponse> response) {
+                    // Si la respuesta es correcta, muestra un mensaje de éxito
                     if (response.isSuccessful()) {
-                        Toast.makeText(context, "Cat added to favourites", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(context, R.string.success_add_cat, Toast.LENGTH_SHORT).show();
+                    // Si la respuesta es incorrecta, muestra un mensaje de error
                     } else {
-                        Toast.makeText(context, "Error adding cat to favourites", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(context, R.string.error_add_cat, Toast.LENGTH_SHORT).show();
                     }
                 }
-
+                // Error en la llamada a la API
                 @Override
                 public void onFailure(Call<NewFavouriteCatResponse> call, Throwable t) {
-                    Toast.makeText(context, "Error adding cat to favourites", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, R.string.error_add_cat, Toast.LENGTH_SHORT).show();
                 }
             });
 
@@ -92,13 +88,11 @@ public class CatAdapter extends RecyclerView.Adapter<CatAdapter.ViewHolder> {
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         ImageView catImage;
-        TextView catName;
         Button btnFav;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             catImage = itemView.findViewById(R.id.cat_image);
-            catName = itemView.findViewById(R.id.cat_name);
             btnFav = itemView.findViewById(R.id.btn_fav);
         }
     }

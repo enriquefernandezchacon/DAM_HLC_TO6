@@ -24,14 +24,6 @@ public interface ICatApiService {
     Call<List<Cat>> getCats(@Query("limit") int limit);
 
     /// <summary>
-    /// Obtiene un gato por su id
-    /// @param catId Id del gato a obtener
-    /// </summary>
-    @Headers("x-api-key: "+ BuildConfig.API_KEY)
-    @GET("v1/images/{image_id}")
-    Call<Cat> getCatById(@Path("image_id") String catId);
-
-    /// <summary>
     /// Obtiene una lista de gatos añadidos a favoritos
     /// </summary>
     @Headers("x-api-key: "+ BuildConfig.API_KEY)
